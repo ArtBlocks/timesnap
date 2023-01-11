@@ -201,13 +201,22 @@ module.exports = async function (config) {
         }
       });
     }
-    for (let i = 1; i <= framesToCapture; i++) {
+    var animatedFramesToCapture = config.startDelay ? config.startDelay * fps : 1;
+    var totalFramesToCapture = animatedFramesToCapture + framesToCapture;
+
+    for (let i = 1; i <= animatedFramesToCapture; i ++) {
       addMarker({
-        time: delayMs + frameNumToTime(i, framesToCapture),
-        type: 'Capture',
-        data: { frameCount: i }
+        time: frameNumToTime(i, totalFramesToCapture),
+        type: 'Only Animate'
       });
-      captureTimes.push(delayMs + frameNumToTime(i, framesToCapture));
+    }
+    for (let i = animatedFramesToCapture; i <= totalFramesToCapture; i++) {
+      addMarker({
+        time: delayMs + frameNumToTime(i, totalFramesToCapture),
+        type: 'Capture',
+        data: { frameCount: i - animatedFramesToCapture + 1 }
+      });
+      captureTimes.push(delayMs + frameNumToTime(i, totalFramesToCapture));
     }
 
     // run 'requestAnimationFrame' early on, just in case if there
